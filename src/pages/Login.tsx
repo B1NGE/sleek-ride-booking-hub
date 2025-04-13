@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
@@ -15,6 +15,10 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we have a redirect target
+  const from = location.state?.from || '/bookings';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,7 +44,9 @@ const Login = () => {
           title: "Success",
           description: "You have successfully logged in",
         });
-        navigate('/bookings');
+        
+        // Navigate to the intended destination, with a state to indicate we came from login
+        navigate(from, { state: { from: '/login' }, replace: true });
       } else {
         toast({
           title: "Error",

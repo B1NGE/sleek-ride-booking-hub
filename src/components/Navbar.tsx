@@ -1,12 +1,48 @@
 
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
-import { Menu, X, UserCircle } from 'lucide-react';
+import { Menu, X, UserCircle, LogOut } from 'lucide-react';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if user is logged in when component mounts or route changes
+  useEffect(() => {
+    // This is a simplistic implementation - in a real app, this would check
+    // authentication state from a context, Redux store, or token in localStorage
+    const checkLoginStatus = () => {
+      // For demo purposes, if the user is on the bookings page or related pages,
+      // we'll assume they're logged in
+      const loggedInRoutes = ['/bookings', '/new-booking', '/edit-booking'];
+      const isOnProtectedRoute = loggedInRoutes.some(route => 
+        location.pathname.startsWith(route)
+      );
+      
+      // If coming from login page with success, consider them logged in
+      if (location.pathname === '/bookings' && location.state?.from === '/login') {
+        setIsLoggedIn(true);
+      } 
+      // For demo: If on protected route, ensure logged in state
+      else if (isOnProtectedRoute) {
+        setIsLoggedIn(true);
+      }
+    };
+
+    checkLoginStatus();
+  }, [location]);
+
+  const handleLogout = () => {
+    // In a real app, this would clear the auth token, call a logout API, etc.
+    setIsLoggedIn(false);
+    setIsOpen(false);
+    
+    // Navigate to home
+    navigate('/', { replace: true });
+  };
 
   return (
     <nav className="sticky top-0 z-50 bg-charcoal/95 backdrop-blur-sm border-b border-border">
@@ -27,13 +63,13 @@ const Navbar = () => {
               <>
                 <Link to="/bookings" className="nav-link">My Bookings</Link>
                 <Button 
-                  variant="ghost" 
+                  variant="outline" 
                   size="sm" 
                   className="flex items-center text-white"
-                  onClick={() => setIsLoggedIn(false)} 
+                  onClick={handleLogout} 
                 >
-                  <UserCircle className="w-5 h-5 mr-2" />
-                  Profile
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
                 </Button>
               </>
             ) : (
@@ -88,12 +124,10 @@ const Navbar = () => {
                   My Bookings
                 </Link>
                 <button 
-                  onClick={() => {
-                    setIsLoggedIn(false);
-                    setIsOpen(false);
-                  }}
-                  className="block px-3 py-2 text-gray-300 hover:bg-luxury-purple/20 rounded-md text-left"
+                  onClick={handleLogout}
+                  className="block px-3 py-2 text-gray-300 hover:bg-luxury-purple/20 rounded-md text-left flex items-center"
                 >
+                  <LogOut className="w-4 h-4 mr-2" />
                   Logout
                 </button>
               </>

@@ -1,11 +1,14 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { useToast } from "../hooks/use-toast";
-import { CalendarClock, Clock, FileEdit, Plus, MapPin, Calendar, User, Clock3, Luggage, Car, MessageSquare } from 'lucide-react';
+import { 
+  CalendarClock, Clock, FileEdit, Plus, MapPin, Calendar, 
+  User, Clock3, Luggage, Car, MessageSquare, History
+} from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 
 // Mock booking data
@@ -20,7 +23,14 @@ const upcomingBookings = [
     passengers: 2,
     luggage: 2,
     status: 'confirmed',
-    specialRequests: 'Extra stop at Starbucks'
+    specialRequests: 'Extra stop at Starbucks',
+    auditTrail: [
+      {
+        timestamp: '2025-04-10T09:00:00Z',
+        action: 'created',
+        details: 'Booking created'
+      }
+    ]
   },
   {
     id: 'BK-2023-0002',
@@ -32,7 +42,14 @@ const upcomingBookings = [
     passengers: 4,
     luggage: 4,
     status: 'pending',
-    specialRequests: ''
+    specialRequests: '',
+    auditTrail: [
+      {
+        timestamp: '2025-04-12T15:30:00Z',
+        action: 'created',
+        details: 'Booking created'
+      }
+    ]
   }
 ];
 
@@ -47,7 +64,19 @@ const pastBookings = [
     passengers: 1,
     luggage: 2,
     status: 'completed',
-    specialRequests: ''
+    specialRequests: '',
+    auditTrail: [
+      {
+        timestamp: '2025-03-10T12:00:00Z',
+        action: 'created',
+        details: 'Booking created'
+      },
+      {
+        timestamp: '2025-03-15T18:30:00Z',
+        action: 'completed',
+        details: 'Ride completed'
+      }
+    ]
   }
 ];
 
@@ -57,23 +86,21 @@ const Bookings = () => {
   const navigate = useNavigate();
 
   const handleNewBooking = () => {
-    toast({
-      title: "Coming Soon",
-      description: "The booking creation feature will be available soon.",
-    });
+    navigate('/new-booking');
   };
 
   const handleEditBooking = (id: string) => {
-    toast({
-      title: "Coming Soon",
-      description: `Edit functionality for booking ${id} will be available soon.`,
-    });
+    navigate(`/edit-booking/${id}`);
   };
 
   const handleCancelBooking = (id: string) => {
     toast({
       description: `Booking ${id} has been cancelled.`,
     });
+  };
+
+  const handleViewAuditTrail = (id: string) => {
+    navigate(`/edit-booking/${id}`, { state: { showAuditTrail: true } });
   };
 
   // Status badge component
@@ -165,6 +192,18 @@ const Bookings = () => {
                   <div className="text-xs text-gray-400">{booking.specialRequests}</div>
                 </div>
               </div>
+            )}
+            
+            {booking.auditTrail && booking.auditTrail.length > 0 && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs w-full flex justify-center items-center text-muted-foreground hover:text-foreground"
+                onClick={() => handleViewAuditTrail(booking.id)}
+              >
+                <History className="h-3 w-3 mr-1" />
+                View Change History ({booking.auditTrail.length} {booking.auditTrail.length === 1 ? 'entry' : 'entries'})
+              </Button>
             )}
             
             {showActions && booking.status !== 'completed' && booking.status !== 'cancelled' && (

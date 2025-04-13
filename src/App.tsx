@@ -8,6 +8,8 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Bookings from "./pages/Bookings";
+import NewBooking from "./pages/NewBooking";
+import EditBooking from "./pages/EditBooking";
 import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
@@ -29,6 +31,8 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               <Route path="/bookings" element={<Bookings />} />
+              <Route path="/new-booking" element={<NewBooking />} />
+              <Route path="/edit-booking/:bookingId" element={<EditBooking />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
